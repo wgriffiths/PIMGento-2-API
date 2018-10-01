@@ -31,6 +31,7 @@ With PIMGento2 (API), you can import :
 
 ### Requirements
 
+* PHP ^7.1 (Due to Akeneo PHP API client dependency `nyholm/psr7`)
 * Akeneo PIM >= 2.0 (CE & EE)
 * Magento >= 2.1 (CE & EE)
 * Database encoding must be UTF-8
