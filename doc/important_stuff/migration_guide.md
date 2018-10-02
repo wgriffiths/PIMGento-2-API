@@ -39,10 +39,10 @@ php bin/magento cache:flush
 ```
 
 ### Configure PIMGento2 (API) in Magento 2 backend :
-Please, follow our configuration guide : [III. Configuration](../important-stuff/how_to.md)
+Please, follow our configuration guide : [III. Configuration](../important_stuff/how_to.md)
 
 ### Re-import all entities :
-Please, follow our configuration guide : [III. Configuration](../important-stuff/how_to.md)
+Please, follow our configuration guide : [III. Configuration](../important_stuff/how_to.md)
 
 ### Important notes :
 * It is important to know that the table named "pimgento_variant" in the CSV version is now called "pimgento_product_model", this is why you need to re-import all entities after migrating to be sure that all data will be set correctly.
