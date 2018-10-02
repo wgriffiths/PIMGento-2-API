@@ -6,7 +6,7 @@ PIMGento2 (API) is a Magento 2 extension that allows you to import your catalog 
 
 You can discover PIMGento2 (API) on the official website (https://www.pimgento.com/).
 
-> This version is replacing the old PIMGento2 connector (https://github.com/Agence-DnD/PIMGento-2).
+> The first version of the PIMGento2 connector will not be maintained anymore by the end of 2018 (https://github.com/Agence-DnD/PIMGento-2).
 
 ### Documentation
 
