@@ -1,0 +1,107 @@
+"Pimgento","Pimgento"
+"Pimgento Section","Pimgento-Sektion"
+"Akeneo API Configuration","Akeneo-API-Konfiguration"
+"Akeneo base URL","Akeneo Basis-URL"
+"Akeneo username","Akeneo Benutzername"
+"The Akeneo user should have permissions to list","Der Akeneo-Benutzer sollte Berechtigungen zum Auflisten haben"
+"Akeneo password","Akeneo Passwort"
+"Akeneo API client ID","Akeneo API-Client-ID"
+"Akeneo API client secret","Akeneo-API-Client-Geheimnis"
+"Is Akeneo enterprise","Akeneo ist eine Unternehmensausgabe"
+"PIM API connection error","PIM API verbindungsfehler"
+"Import API","API importieren"
+"Start import","Importieren starten"
+"Import ID : %1","Import-ID: %1"
+"Select import type:","Import-Typ auswählen:"
+"Import","Importieren"
+"Waiting for import...","Warten auf den Import..."
+"%1 Import already running","%1 Import läuft bereits"
+"%1 Import code not found","%1 Import-Code nicht gefunden"
+"%1 Start import","%1 Import starten"
+"Options:","Optionen:"
+"--code","--code",
+"Available codes:","Verfügbare Codes:"
+"Example:","Beispiel:"
+"pimgento:import --code=%1","pimgento:import --code=%1"
+"Area code already set","Ortsvorwahl bereits eingestellt"
+"Filter products","Filterprodukte"
+"Completeness type","Vollständigkeitstyp"
+"Completeness value","Vollständigkeitswert"
+"Status","Status"
+"Updated","Updated"
+"Import only product updated since last X days. Leave blank for no filter.","Import only product updated since last X days. Leave blank for no filter."
+"Families","Familie"
+"Select the families you don't want to retrieve products from.<br/> If the multiselect is empty, it means you don't have any families in your Akeneo, or the provided credentials are wrong.","Wähle die Familien, aus denen du keine Produkte abrufen möchtest, aus.<br/> Wenn der Multiselect leer ist, bedeutet dies, dass du keine Familien in deinem Akeneo hast, oder die angegebenen Zugangsdaten falsch sind"
+"No condition","Keine Kondition"
+"Lower than","Niedriger als"
+"Lower or equals than","Niedriger oder gleich als"
+"Lower than on all locales","Niedriger als in allen Gebietsschematas"
+"Lower or equals than on all locales","Niedriger oder gleich als in allen Gebietsschemata"
+"Greater than","Größer als"
+"Greater or equals than","Größer oder gleich"
+"Greater than on all locales","Größer als in allen Gebietsschemata"
+"Greater or equals than on all locales","Größer oder gleich als in allen Gebietsschemata"
+"Equals","Gleich"
+"Differ","Unterscheiden"
+"Enabled","Freigegeben"
+"Disabled","Deaktiviert"
+"Pimgento","Pimgento"
+"Channel","Kanal"
+"Locales","Sprachumgebungen"
+"Select the channel to apply the completeness filter on","Wählen Sie den Kanal, auf dem der Vollständigkeitsfilter angewendet werden soll"
+"Select the locales to apply the completeness filter on","Wählen Sie die Gebietsschemata, in denen der Vollständigkeitsfilter angewendet werden soll"
+"Build your query using a json.<br/>
+For example :<br/>
+<pre>
+{
+    ""search"": {
+        ""enabled"": [{
+            ""operator"": ""="",
+            ""value"": true
+        }],
+        ""sku"": [{
+            ""operator"": ""STARTS WITH"",
+            ""value"": ""A""
+        }]
+    },
+    ""scope"": ""ecommerce"",
+    ""locales"": ""fr_FR,de_DE""
+}</pre>","Erstelle deine Suchanfrage mit einem json.<br/>
+Zum Beispiel :<br/>
+<pre>
+{
+    ""search"": {
+        ""enabled"": [{
+            ""operator"": ""="",
+            ""value"": true
+        }],
+        ""sku"": [{
+            ""operator"": ""STARTS WITH"",
+            ""value"": ""A""
+        }]
+    },
+    ""scope"": ""ecommerce"",
+    ""locales"": ""fr_FR,de_DE""
+}</pre>"
+"Pagination size","Seitengröße"
+"Must be a value between 1 and 100. Default value is 10.","Muss ein Wert zwischen 1 und 100 sein. Der Standardwert ist 10."
+"No results from Akeneo";"Keine Ergebnisse von Akeneo"
+"Website Mapping","Website-Mapping"
+"Match Magento website with Pim channel","Magento-Webseite mit Pim-Kanal verknüpfen"
+"Website","Webseite"
+"No options found","Keine Optionen gefunden"
+"Media import is not enabled","Medienimport ist nicht aktiviert"
+"PIM Images Attributes is empty","PIM-Bildattribute ist leer"
+"Warning: %1 attribute does not exist","Warnung: %1 Attribut existiert nicht"
+"Import Media Files","Mediendateien importieren"
+"PIM Images Attributes","PIM-Bildattribute"
+"Product Images Mapping","Produktbildmapping"
+"PIM Attribute","PIM-Attribut"
+"Magento Attribute","Magento-Attribut"
+"Import Asset Files","Asset-Dateien importieren"
+"PIM Asset Attributes","PIM Asset Attribute"
+"Only available on Pim Enterprise","Nur in Pim Enterprise verfügbar"
+"Asset import is not enabled","Asset-Import ist nicht aktiviert"
+"PIM Asset Attributes is empty","PIM Asset Attribute ist leer"
+"Test API credentials","Test API Anmeldedaten"
+"The connection is working fine","Die Verbindung funktioniert einwandfrei"
