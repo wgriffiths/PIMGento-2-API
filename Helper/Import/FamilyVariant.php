@@ -18,11 +18,10 @@ class FamilyVariant extends Entities
      * Get columns from the api result
      *
      * @param array $result
-     * @param array $keys
      *
      * @return array
      */
-    protected function getColumnsFromResult(array $result, array $keys = [])
+    protected function getColumnsFromResult(array $result)
     {
         /** @var array $columns */
         $columns = [];
