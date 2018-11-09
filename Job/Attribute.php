@@ -261,7 +261,7 @@ class Attribute extends Import
         /** @var string $familyAttributeRelationsTable */
         $familyAttributeRelationsTable = $connection->getTableName('pimgento_family_attribute_relations');
 
-        $connection->addColumn($tmpTable, '_attribute_set_id', 'TEXT NULL');
+        $connection->addColumn($tmpTable, '_attribute_set_id', 'text');
         /** @var string $importTmpTable */
         $importTmpTable = $connection->select()->from($tmpTable, ['code', '_entity_id']);
         /** @var string $queryTmpTable */
