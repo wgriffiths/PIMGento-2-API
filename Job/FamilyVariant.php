@@ -130,7 +130,7 @@ class FamilyVariant extends Import
         }
         /** @var array $variantFamily */
         $variantFamily = $variantFamilies->getItems();
-        if (empty($family)) {
+        if (empty($variantFamily)) {
             $this->setMessage(__('No results retrieved from Akeneo'));
             $this->stop(1);
 
