@@ -500,6 +500,28 @@ class Product extends Import
      */
     public function matchEntities()
     {
+        /** @var AdapterInterface $connection */
+        $connection = $this->entitiesHelper->getConnection();
+        /** @var string $tmpTable */
+        $tmpTable = $this->entitiesHelper->getTableName($this->getCode());
+
+        /** @var array $duplicates */
+        $duplicates = $connection->fetchCol(
+            $connection->select()
+                ->from($tmpTable, ['identifier'])
+                ->group('identifier')
+                ->having('COUNT(identifier) > ?', 1)
+        );
+
+        if (!empty($duplicates)) {
+            $this->setMessage(
+                __('Duplicates sku detected. Make sure Product Model code is not used for a simple product sku. Duplicates: %1', join(', ', $duplicates))
+            );
+            $this->stop(true);
+
+            return;
+        }
+
         $this->entitiesHelper->matchEntity(
             'identifier',
             'catalog_product_entity',
