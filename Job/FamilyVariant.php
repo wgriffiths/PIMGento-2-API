@@ -211,7 +211,7 @@ class FamilyVariant extends Import
         /** @var array $attributes */
         $attributes = $connection->fetchPairs(
             $connection->select()->from(
-                $connection->getTableName('eav_attribute'),
+                $this->entitiesHelper->getTable('eav_attribute'),
                 ['attribute_code', 'attribute_id']
             )->where('entity_type_id = ?', $this->getEntityTypeId())
         );
@@ -250,7 +250,7 @@ class FamilyVariant extends Import
         );
 
         $connection->query(
-            $connection->updateFromSelect($query, ['p' => $connection->getTableName('pimgento_product_model')])
+            $connection->updateFromSelect($query, ['p' => $this->entitiesHelper->getTable('pimgento_product_model')])
         );
     }
 

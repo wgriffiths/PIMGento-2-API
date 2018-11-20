@@ -397,7 +397,7 @@ class Category extends Import
         /** @var string $tableName */
         $tmpTable = $this->entitiesHelper->getTableName($this->getCode());
 
-        if ($connection->isTableExists($connection->getTableName('sequence_catalog_category'))) {
+        if ($connection->isTableExists($this->entitiesHelper->getTable('sequence_catalog_category'))) {
             /** @var array $values */
             $values = [
                 'sequence_value' => '_entity_id',
@@ -407,7 +407,7 @@ class Category extends Import
             $connection->query(
                 $connection->insertFromSelect(
                     $parents,
-                    $connection->getTableName('sequence_catalog_category'),
+                    $this->entitiesHelper->getTable('sequence_catalog_category'),
                     array_keys($values),
                     AdapterInterface::INSERT_ON_DUPLICATE
                 )
@@ -415,7 +415,7 @@ class Category extends Import
         }
 
         /** @var string $table */
-        $table = $connection->getTableName('catalog_category_entity');
+        $table = $this->entitiesHelper->getTable('catalog_category_entity');
 
         /** @var array $values */
         $values = [
@@ -487,7 +487,7 @@ class Category extends Import
 
         $this->entitiesHelper->setValues(
             $this->getCode(),
-            $connection->getTableName('catalog_category_entity'),
+            'catalog_category_entity',
             $values,
             $entityTypeId,
             0,
@@ -514,7 +514,7 @@ class Category extends Import
                 ];
                 $this->entitiesHelper->setValues(
                     $this->getCode(),
-                    $connection->getTableName('catalog_category_entity'),
+                    'catalog_category_entity',
                     $values,
                     $entityTypeId,
                     $store['store_id']
@@ -532,13 +532,11 @@ class Category extends Import
     {
         /** @var AdapterInterface $connection */
         $connection = $this->entitiesHelper->getConnection();
-        /** @var string $tableName */
-        $tmpTable = $this->entitiesHelper->getTableName($this->getCode());
 
         $connection->query('
-            UPDATE `' . $connection->getTableName('catalog_category_entity') . '` c SET `children_count` = (
+            UPDATE `' . $this->entitiesHelper->getTable('catalog_category_entity') . '` c SET `children_count` = (
                 SELECT COUNT(`parent_id`) FROM (
-                    SELECT * FROM `' . $connection->getTableName('catalog_category_entity') . '`
+                    SELECT * FROM `' . $this->entitiesHelper->getTable('catalog_category_entity') . '`
                 ) tmp
                 WHERE tmp.`path` LIKE CONCAT(c.`path`,\'/%\')
             )
@@ -612,7 +610,7 @@ class Category extends Import
                     /** @var string|null $rewriteId */
                     $rewriteId = $connection->fetchOne(
                         $connection->select()
-                            ->from($connection->getTableName('url_rewrite'), ['url_rewrite_id'])
+                            ->from($this->entitiesHelper->getTable('url_rewrite'), ['url_rewrite_id'])
                             ->where('entity_type = ?', CategoryUrlRewriteGenerator::ENTITY_TYPE)
                             ->where('entity_id = ?', $category->getEntityId())
                             ->where('store_id = ?', $category->getStoreId())
@@ -620,7 +618,7 @@ class Category extends Import
 
                     if ($rewriteId) {
                         $connection->update(
-                            $connection->getTableName('url_rewrite'),
+                            $this->entitiesHelper->getTable('url_rewrite'),
                             ['request_path' => $requestPath],
                             ['url_rewrite_id = ?' => $rewriteId]
                         );
@@ -637,7 +635,7 @@ class Category extends Import
                         ];
 
                         $connection->insertOnDuplicate(
-                            $connection->getTableName('url_rewrite'),
+                            $this->entitiesHelper->getTable('url_rewrite'),
                             $data,
                             array_keys($data)
                         );
