@@ -230,7 +230,7 @@ class Option extends Import
         }
         /** @var Select $options */
         $options = $connection->select()->from(['a' => $tmpTable], $columns)->joinInner(
-                ['b' => $connection->getTableName('pimgento_entities')],
+                ['b' => $this->entitiesHelper->getTable('pimgento_entities')],
                 'a.attribute = b.code AND b.import = "attribute"',
                 [
                     'attribute_id' => 'b.entity_id',
@@ -239,7 +239,7 @@ class Option extends Import
         $connection->query(
             $connection->insertFromSelect(
                 $options,
-                $connection->getTableName('eav_attribute_option'),
+                $this->entitiesHelper->getTable('eav_attribute_option'),
                 ['option_id', 'sort_order', 'attribute_id'],
                 1
             )
@@ -278,14 +278,14 @@ class Option extends Import
                             'value'     => 'labels-'.$local,
                         ]
                     )->joinInner(
-                        ['b' => $connection->getTableName('pimgento_entities')],
+                        ['b' => $this->entitiesHelper->getTable('pimgento_entities')],
                         'a.attribute = b.code AND b.import = "attribute"',
                         []
                     );
                 $connection->query(
                     $connection->insertFromSelect(
                         $options,
-                        $connection->getTableName('eav_attribute_option_value'),
+                        $this->entitiesHelper->getTable('eav_attribute_option_value'),
                         ['option_id', 'store_id', 'value'],
                         1
                     )
