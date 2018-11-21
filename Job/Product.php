@@ -1341,6 +1341,25 @@ class Product extends Import
                         $product->getStoreId()
                     );
 
+                    /** @var string|null $exists */
+                    $exists = $connection->fetchOne(
+                        $connection->select()
+                            ->from($connection->getTableName('url_rewrite'), new Expr(1))
+                            ->where('entity_type = ?', ProductUrlRewriteGenerator::ENTITY_TYPE)
+                            ->where('request_path = ?', $requestPath)
+                            ->where('store_id = ?', $product->getStoreId())
+                            ->where('entity_id <> ?', $product->getEntityId())
+                    );
+
+                    if ($exists) {
+                        $product->setUrlKey($product->getUrlKey() . '-' . $product->getStoreId());
+                        /** @var string $requestPath */
+                        $requestPath = $this->productUrlPathGenerator->getUrlPathWithSuffix(
+                            $product,
+                            $product->getStoreId()
+                        );
+                    }
+
                     /** @var string|null $rewriteId */
                     $rewriteId = $connection->fetchOne(
                         $connection->select()
