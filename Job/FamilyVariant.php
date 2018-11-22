@@ -177,7 +177,12 @@ class FamilyVariant extends Import
         /** @var string $tmpTable */
         $tmpTable = $this->entitiesHelper->getTableName($this->getCode());
 
-        $connection->addColumn($tmpTable, '_axis', 'VARCHAR(255)');
+        $connection->addColumn($tmpTable, '_axis', [
+            'type' => 'text',
+            'length' => 255,
+            'default' => '',
+            'COMMENT' => ' '
+        ]);
         /** @var array $columns */
         $columns = [];
         /** @var int $i */

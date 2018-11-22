@@ -268,7 +268,7 @@ class Entities extends AbstractHelper
          */
         foreach ($result as $key => $value) {
             if (!$this->connection->tableColumnExists($tableName, $key)) {
-                $this->connection->addColumn($tableName, $key, 'TEXT NULL');
+                $this->connection->addColumn($tableName, $key, 'text');
             }
         }
 
