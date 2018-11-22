@@ -105,3 +105,4 @@ Par exemple :<br/>
 "PIM Asset Attributes is empty","Les attributs Asset du PIM sont vides"
 "Test API credentials","Test de connexion à l'API"
 "The connection is working fine","La connexion est opérationnelle"
+"Duplicates sku detected. Make sure Product Model code is not used for a simple product sku. Duplicates: %1","Doublon de sku detecté. Assurez-vous que le code d'un modèle de produit n'est pas utilisé pour un produit simple. Doublons : %1"

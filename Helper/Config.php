@@ -19,6 +19,7 @@ use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\Framework\File\Uploader;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Eav\Model\Entity\Attribute\AbstractAttribute;
+use Magento\Catalog\Helper\Product as ProductHelper;
 
 /**
  * Class Config
@@ -600,5 +601,21 @@ class Config extends AbstractHelper
     public function getMediaFilePath($filename)
     {
         return Uploader::getDispretionPath($filename) . '/' . Uploader::getCorrectFileName($filename);
+    }
+
+    /**
+     * Retrieve if category is used in product URL
+     *
+     * @param int $storeId
+     *
+     * @return bool
+     */
+    public function isCategoryUsedInProductUrl($storeId = null)
+    {
+        return $this->scopeConfig->isSetFlag(
+            ProductHelper::XML_PATH_PRODUCT_URL_USE_CATEGORY,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
 }
