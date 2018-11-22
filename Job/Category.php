@@ -580,7 +580,7 @@ class Category extends Import
                     /** @var string|null $exists */
                     $exists = $connection->fetchOne(
                         $connection->select()
-                            ->from($connection->getTableName('url_rewrite'), new Expr(1))
+                            ->from($this->entitiesHelper->getTable('url_rewrite'), new Expr(1))
                             ->where('entity_type = ?', CategoryUrlRewriteGenerator::ENTITY_TYPE)
                             ->where('request_path = ?', $requestPath)
                             ->where('store_id = ?', $category->getStoreId())
