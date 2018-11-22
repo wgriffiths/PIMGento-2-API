@@ -257,9 +257,6 @@ class Category extends Import
         $connection->addColumn($tmpTable, 'path', 'VARCHAR(255) NOT NULL DEFAULT ""');
         $connection->addColumn($tmpTable, 'parent_id', 'INT(11) NOT NULL DEFAULT 0');
 
-        /** @var array $stores */
-        $stores = $this->storeHelper->getStores('lang');
-
         /** @var array $values */
         $values = [
             'level'     => 1,
@@ -268,34 +265,13 @@ class Category extends Import
         ];
         $connection->update($tmpTable, $values, 'parent IS NULL');
 
-        /** @var array $updateRewrite */
-        $updateRewrite = [];
-
-        foreach ($stores as $local => $affected) {
-            if (!$connection->tableColumnExists($tmpTable, 'url_key-' . $local)) {
-                continue;
-            }
-            $connection->addColumn(
-                $tmpTable,
-                '_url_rewrite-' . $local,
-                'VARCHAR(255) NOT NULL DEFAULT ""'
-            );
-            $updateRewrite[] = 'c1.`_url_rewrite-' . $local . '` =
-                IF(
-                    c1.`url_key-' . $local . '` <> "",
-                    TRIM(BOTH "/" FROM CONCAT(c2.`_url_rewrite-' . $local . '`, "/", c1.`url_key-' . $local . '`)),
-                    ""
-                 )';
-        }
-
         /** @var int $depth */
         $depth = self::MAX_DEPTH;
         for ($i = 1; $i <= $depth; $i++) {
             $connection->query('
                 UPDATE `' . $tmpTable . '` c1
                 INNER JOIN `' . $tmpTable . '` c2 ON c2.`code` = c1.`parent`
-                SET ' . (!empty($updateRewrite) ? join(',', $updateRewrite) . ',' : '') . '
-                    c1.`level` = c2.`level` + 1,
+                SET c1.`level` = c2.`level` + 1,
                     c1.`path` = CONCAT(c2.`path`, "/", c1.`_entity_id`),
                     c1.`parent_id` = c2.`_entity_id`
                 WHERE c1.`level` <= c2.`level` - 1
@@ -572,6 +548,25 @@ class Category extends Import
                         $category,
                         $category->getStoreId()
                     );
+
+                    /** @var string|null $exists */
+                    $exists = $connection->fetchOne(
+                        $connection->select()
+                            ->from($connection->getTableName('url_rewrite'), new Expr(1))
+                            ->where('entity_type = ?', CategoryUrlRewriteGenerator::ENTITY_TYPE)
+                            ->where('request_path = ?', $requestPath)
+                            ->where('store_id = ?', $category->getStoreId())
+                            ->where('entity_id <> ?', $category->getEntityId())
+                    );
+
+                    if ($exists) {
+                        $category->setUrlKey($category->getUrlKey() . '-' . $category->getStoreId());
+                        /** @var string $requestPath */
+                        $requestPath = $this->categoryUrlPathGenerator->getUrlPathWithSuffix(
+                            $category,
+                            $category->getStoreId()
+                        );
+                    }
 
                     /** @var string|null $rewriteId */
                     $rewriteId = $connection->fetchOne(
