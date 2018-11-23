@@ -403,6 +403,21 @@ class Product extends Import
             'COMMENT' => ' '
         ]);
 
+        /** @var string $variantTable */
+        $variantTable = $this->entitiesHelper->getTable('pimgento_product_model');
+
+        $select = $connection->select()
+            ->from(false, [$groupColumn => 'v.parent'])
+            ->joinInner(
+                ['v' => $variantTable],
+                'v.parent IS NOT NULL AND e.' . $groupColumn . ' = v.code',
+                []
+            );
+
+        $connection->query(
+            $connection->updateFromSelect($select, ['e' => $tmpTable])
+        );
+
         /** @var array $data */
         $data = [
             'identifier'         => 'e.' . $groupColumn,
@@ -431,8 +446,6 @@ class Product extends Import
 
         /** @var array $stores */
         $stores = $this->storeHelper->getAllStores();
-        /** @var string $variantTable */
-        $variantTable = $this->entitiesHelper->getTable('pimgento_product_model');
 
         /** @var array $attribute */
         foreach ($additional as $attribute) {

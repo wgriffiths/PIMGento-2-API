@@ -541,6 +541,9 @@ class Category extends Import
              * @var array $store
              */
             foreach ($affected as $store) {
+                if (!$store['store_id']) {
+                    continue;
+                }
                 /** @var \Magento\Framework\DB\Select $select */
                 $select = $connection->select()
                     ->from(
