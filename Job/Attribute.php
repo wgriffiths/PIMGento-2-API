@@ -184,7 +184,7 @@ class Attribute extends Import
         $connection = $this->entitiesHelper->getConnection();
         /** @var Select $select */
         $select = $connection->select()->from(
-            $connection->getTableName('eav_attribute'),
+            $this->entitiesHelper->getTable('eav_attribute'),
             [
                 'import'    => new Expr('"attribute"'),
                 'code'      => 'attribute_code',
@@ -195,7 +195,7 @@ class Attribute extends Import
         $connection->query(
             $connection->insertFromSelect(
                 $select,
-                $connection->getTableName('pimgento_entities'),
+                $this->entitiesHelper->getTable('pimgento_entities'),
                 ['import', 'code', 'entity_id'],
                 2
             )
@@ -259,7 +259,7 @@ class Attribute extends Import
         /** @var string $tmpTable */
         $tmpTable = $this->entitiesHelper->getTableName($this->getCode());
         /** @var string $familyAttributeRelationsTable */
-        $familyAttributeRelationsTable = $connection->getTableName('pimgento_family_attribute_relations');
+        $familyAttributeRelationsTable = $this->entitiesHelper->getTable('pimgento_family_attribute_relations');
 
         $connection->addColumn($tmpTable, '_attribute_set_id', 'text');
         /** @var string $importTmpTable */
@@ -314,7 +314,7 @@ class Attribute extends Import
                 'attribute_code' => $row['code'],
             ];
             $connection->insertOnDuplicate(
-                $connection->getTableName('eav_attribute'),
+                $this->entitiesHelper->getTable('eav_attribute'),
                 $values,
                 array_keys($values)
             );
@@ -323,7 +323,7 @@ class Attribute extends Import
                 'attribute_id' => $row['_entity_id'],
             ];
             $connection->insertOnDuplicate(
-                $connection->getTableName('catalog_eav_attribute'),
+                $this->entitiesHelper->getTable('catalog_eav_attribute'),
                 $values,
                 array_keys($values)
             );
@@ -452,7 +452,7 @@ class Attribute extends Import
                     foreach ($data as $store) {
                         /** @var string $exists */
                         $exists = $connection->fetchOne(
-                            $connection->select()->from($connection->getTableName('eav_attribute_label'))->where(
+                            $connection->select()->from($this->entitiesHelper->getTable('eav_attribute_label'))->where(
                                 'attribute_id = ?',
                                 $row['_entity_id']
                             )->where('store_id = ?', $store['store_id'])
@@ -469,14 +469,14 @@ class Attribute extends Import
                                 'store_id = ?'     => $store['store_id'],
                             ];
 
-                            $connection->update($connection->getTableName('eav_attribute_label'), $values, $where);
+                            $connection->update($this->entitiesHelper->getTable('eav_attribute_label'), $values, $where);
                         } else {
                             $values = [
                                 'attribute_id' => $row['_entity_id'],
                                 'store_id'     => $store['store_id'],
                                 'value'        => $row['labels-'.$lang],
                             ];
-                            $connection->insert($connection->getTableName('eav_attribute_label'), $values);
+                            $connection->insert($this->entitiesHelper->getTable('eav_attribute_label'), $values);
                         }
                     }
                 }

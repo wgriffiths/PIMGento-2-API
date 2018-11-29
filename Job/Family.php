@@ -192,7 +192,7 @@ class Family extends Import
         $connection->query(
             $connection->insertFromSelect(
                 $families,
-                $connection->getTableName('eav_attribute_set'),
+                $this->entitiesHelper->getTable('eav_attribute_set'),
                 array_keys($values),
                 1
             )
@@ -212,7 +212,7 @@ class Family extends Import
         /** @var string $tmpTable */
         $tmpTable = $this->entitiesHelper->getTableName($this->getCode());
         /** @var string $familyAttributeRelationsTable */
-        $familyAttributeRelationsTable = $connection->getTableName('pimgento_family_attribute_relations');
+        $familyAttributeRelationsTable = $this->entitiesHelper->getTable('pimgento_family_attribute_relations');
 
         $connection->delete($familyAttributeRelationsTable);
         /** @var array $values */
