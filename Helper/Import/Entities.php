@@ -565,7 +565,7 @@ class Entities extends AbstractHelper
         $connection = $this->getConnection();
 
         if ($connection->tableColumnExists($tableName, $source)) {
-            $connection->addColumn($tableName, $target, 'TEXT');
+            $connection->addColumn($tableName, $target, 'text');
             $connection->update(
                 $tableName, array($target => new Expr('`' . $source . '`'))
             );
