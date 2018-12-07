@@ -111,7 +111,7 @@ class Product extends Import
      */
     protected $product;
     /**
-     * This variable containsa ProductUrlPathGenerator
+     * This variable contains a ProductUrlPathGenerator
      *
      * @var ProductUrlPathGenerator $productUrlPathGenerator
      */
@@ -403,6 +403,21 @@ class Product extends Import
             'COMMENT' => ' '
         ]);
 
+        /** @var string $variantTable */
+        $variantTable = $this->entitiesHelper->getTable('pimgento_product_model');
+
+        $select = $connection->select()
+            ->from(false, [$groupColumn => 'v.parent'])
+            ->joinInner(
+                ['v' => $variantTable],
+                'v.parent IS NOT NULL AND e.' . $groupColumn . ' = v.code',
+                []
+            );
+
+        $connection->query(
+            $connection->updateFromSelect($select, ['e' => $tmpTable])
+        );
+
         /** @var array $data */
         $data = [
             'identifier'         => 'e.' . $groupColumn,
@@ -431,8 +446,6 @@ class Product extends Import
 
         /** @var array $stores */
         $stores = $this->storeHelper->getAllStores();
-        /** @var string $variantTable */
-        $variantTable = $this->entitiesHelper->getTable('pimgento_product_model');
 
         /** @var array $attribute */
         foreach ($additional as $attribute) {
@@ -1305,13 +1318,15 @@ class Product extends Import
             $this->storeHelper->getStores(['lang']), // en_US
             $this->storeHelper->getStores(['lang', 'channel_code']) // en_US-channel
         );
+        /** @var bool $isUrlKeyMapped */
+        $isUrlKeyMapped = $this->configHelper->isUrlKeyMapped();
 
         /**
          * @var string $local
          * @var array $affected
          */
         foreach ($stores as $local => $affected) {
-            if (!$connection->tableColumnExists($tmpTable, 'url_key-' . $local)) {
+            if (!$isUrlKeyMapped && !$connection->tableColumnExists($tmpTable, 'url_key-' . $local)) {
                 $connection->addColumn(
                     $tmpTable,
                     'url_key-' . $local,
@@ -1415,8 +1430,7 @@ class Product extends Import
                             );
                             $paths[$requestPath] = [
                                 'request_path' => $requestPath,
-                                'target_path' => 'catalog/product/view/id/' . $product->getEntityId() .
-                                    '/category/' . $category->getId(),
+                                'target_path'  => 'catalog/product/view/id/' . $product->getEntityId() . '/category/' . $category->getId(),
                                 'metadata'     => '{"category_id":"' . $category->getId() . '"}',
                                 'category_id'  => $category->getId(),
                             ];
@@ -1433,8 +1447,7 @@ class Product extends Import
                                 }
                                 $paths[$requestPath] = [
                                     'request_path' => $requestPath,
-                                    'target_path' => 'catalog/product/view/id/' . $product->getEntityId() .
-                                        '/category/' . $parent->getId(),
+                                    'target_path'  => 'catalog/product/view/id/' . $product->getEntityId() . '/category/' . $parent->getId(),
                                     'metadata'     => '{"category_id":"' . $parent->getId() . '"}',
                                     'category_id'  => $parent->getId(),
                                 ];

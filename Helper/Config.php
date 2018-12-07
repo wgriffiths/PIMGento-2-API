@@ -618,4 +618,35 @@ class Config extends AbstractHelper
             $storeId
         );
     }
+
+    /**
+     * Check if url_key attribute is mapped with PIM attribute
+     *
+     * @return bool
+     */
+    public function isUrlKeyMapped()
+    {
+        /** @var mixed $matches */
+        $matches = $this->scopeConfig->getValue(self::PRODUCT_ATTRIBUTE_MAPPING);
+        /** @var mixed[] $matches */
+        $matches = $this->serializer->unserialize($matches);
+        if (!is_array($matches)) {
+            return false;
+        }
+
+        /** @var mixed[] $match */
+        foreach ($matches as $match) {
+            if (!isset($match['pim_attribute'], $match['magento_attribute'])) {
+                continue;
+            }
+
+            /** @var string $magentoAttribute */
+            $magentoAttribute = $match['magento_attribute'];
+            if ($magentoAttribute === 'url_key') {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
