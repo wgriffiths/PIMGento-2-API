@@ -406,17 +406,17 @@ class Product extends Import
         /** @var string $variantTable */
         $variantTable = $this->entitiesHelper->getTable('pimgento_product_model');
 
-        $select = $connection->select()
-            ->from(false, [$groupColumn => 'v.parent'])
-            ->joinInner(
-                ['v' => $variantTable],
-                'v.parent IS NOT NULL AND e.' . $groupColumn . ' = v.code',
-                []
-            );
+        if ($connection->tableColumnExists($variantTable, 'parent')) {
+            $select = $connection->select()->from(false, [$groupColumn => 'v.parent'])->joinInner(
+                    ['v' => $variantTable],
+                    'v.parent IS NOT NULL AND e.' . $groupColumn . ' = v.code',
+                    []
+                );
 
-        $connection->query(
-            $connection->updateFromSelect($select, ['e' => $tmpTable])
-        );
+            $connection->query(
+                $connection->updateFromSelect($select, ['e' => $tmpTable])
+            );
+        }
 
         /** @var array $data */
         $data = [
