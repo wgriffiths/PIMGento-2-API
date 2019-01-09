@@ -17,3 +17,14 @@ Fix duplicated URL
 Fix undefined offset 0 error on product import task
 
 Fix duplicate SKU with product model
+
+### 100.1.3 :
+Fix Magento 2.3 compatibility
+
+Fix configurable product creation with 2 axis
+
+Fix documentation
+
+Reformat translations
+
+Fix localized product URL

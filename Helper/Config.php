@@ -54,6 +54,7 @@ class Config extends AbstractHelper
     const PRODUCT_ATTRIBUTE_MAPPING = 'pimgento/product/attribute_mapping';
     const PRODUCT_CONFIGURABLE_ATTRIBUTES = 'pimgento/product/configurable_attributes';
     const PRODUCT_TAX_CLASS = 'pimgento/product/tax_class';
+    const PRODUCT_URL_GENERATION_ENABLED = 'pimgento/product/url_generation_enabled';
     const PRODUCT_MEDIA_ENABLED = 'pimgento/product/media_enabled';
     const PRODUCT_MEDIA_IMAGES = 'pimgento/product/media_images';
     const PRODUCT_MEDIA_GALLERY = 'pimgento/product/media_gallery';
@@ -463,6 +464,16 @@ class Config extends AbstractHelper
     public function isMediaImportEnabled()
     {
         return $this->scopeConfig->isSetFlag(self::PRODUCT_MEDIA_ENABLED);
+    }
+
+    /**
+     * Description isUrlGenerationEnabled function
+     *
+     * @return bool
+     */
+    public function isUrlGenerationEnabled()
+    {
+        return $this->scopeConfig->isSetFlag(self::PRODUCT_URL_GENERATION_ENABLED);
     }
 
     /**
