@@ -106,3 +106,5 @@ Zum Beispiel :<br/>
 "Warning: %1 attribute does not exist","Warnung: %1 Attribut existiert nicht"
 "Website Mapping","Website-Mapping"
 "Website","Webseite"
+"Regenerate url rewrites","URL-Rewrites regenerieren"
+"Url rewrite generation is not enabled","URL-Rewrites generation ist nich aktiviert"

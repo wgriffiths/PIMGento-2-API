@@ -106,3 +106,5 @@ For example :<br/>
 "Warning: %1 attribute does not exist","Warning: %1 attribute does not exist"
 "Website Mapping","Website Mapping"
 "Website","Website"
+"Regenerate url rewrites","Regenerate url rewrites"
+"Url rewrite generation is not enabled","Url rewrite generation is not enabled"
