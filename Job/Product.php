@@ -284,7 +284,7 @@ class Product extends Import
             'nullable' => false
         ]); // Disabled
 
-        if (!$connection->tableColumnExists($tmpTable, 'url_key')) {
+        if (!$connection->tableColumnExists($tmpTable, 'url_key') && $this->configHelper->isUrlGenerationEnabled()) {
             $connection->addColumn($tmpTable, 'url_key', [
                 'type' => 'text',
                 'length' => 255,
@@ -421,13 +421,15 @@ class Product extends Import
         /** @var array $data */
         $data = [
             'identifier'         => 'e.' . $groupColumn,
-            'url_key'            => 'e.' . $groupColumn,
             '_children'          => new Expr('GROUP_CONCAT(e.identifier SEPARATOR ",")'),
             '_type_id'           => new Expr('"configurable"'),
             '_options_container' => new Expr('"container1"'),
             '_status'            => 'e._status',
             '_axis'              => 'v.axis',
         ];
+        if ($this->configHelper->isUrlGenerationEnabled()) {
+            $data['url_key'] = 'e.' . $groupColumn;
+        }
 
         if ($connection->tableColumnExists($tmpTable, 'family')) {
             $data['family'] = 'e.family';
@@ -1309,6 +1311,15 @@ class Product extends Import
      */
     public function setUrlRewrite()
     {
+        if (!$this->configHelper->isUrlGenerationEnabled()) {
+            $this->setStatus(false);
+            $this->setMessage(
+                __('Url rewrite generation is not enabled')
+            );
+
+            return;
+        }
+
         /** @var AdapterInterface $connection */
         $connection = $this->entitiesHelper->getConnection();
         /** @var string $tableName */
