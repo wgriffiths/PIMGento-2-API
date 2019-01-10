@@ -34,7 +34,7 @@ Zum Beispiel :<br/>
 "%1 Import already running","%1 Import läuft bereits"
 "%1 Import code not found","%1 Import-Code nicht gefunden"
 "%1 Start import","%1 Import starten"
-"--code","--code",
+"--code","--code"
 "Akeneo API client ID","Akeneo API-Client-ID"
 "Akeneo API client secret","Akeneo-API-Client-Geheimnis"
 "Akeneo API Configuration","Akeneo-API-Konfiguration"
