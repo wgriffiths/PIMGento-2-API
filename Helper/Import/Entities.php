@@ -452,8 +452,6 @@ class Entities extends AbstractHelper
             $backendType = $attribute[AttributeInterface::BACKEND_TYPE];
             /** @var string $identifier */
             $identifier = $this->getColumnIdentifier($this->getTable($entityTable . '_' . $backendType));
-            /** @var string $columnName */
-            $columnName = $value;
             /** @var bool $columnExists */
             $columnExists = $connection->tableColumnExists($tableName, $value);
 
