@@ -69,11 +69,54 @@ class Product extends Import
      */
     protected $name = 'Product';
     /**
+     * Akeneo default association types, reformatted as column names
+     *
+     * @var string[] $associationTypes
+     */
+    protected $associationTypes = [
+        Link::LINK_TYPE_RELATED   => [
+            'SUBSTITUTION-products',
+            'SUBSTITUTION-product_models',
+        ],
+        Link::LINK_TYPE_UPSELL    => [
+            'UPSELL-products',
+            'UPSELL-product_models',
+        ],
+        Link::LINK_TYPE_CROSSSELL => [
+            'X_SELL-products',
+            'X_SELL-product_models',
+        ],
+    ];
+    /**
      * list of allowed type_id that can be imported
      *
      * @var string[]
      */
     protected $allowedTypeId = ['simple', 'virtual'];
+    /**
+     * List of column to exclude from attribute value setting
+     *
+     * @var string[]
+     */
+    protected $excludedColumns = [
+        '_entity_id',
+        '_is_new',
+        '_status',
+        '_type_id',
+        '_options_container',
+        '_tax_class_id',
+        '_attribute_set_id',
+        '_visibility',
+        '_children',
+        '_axis',
+        'identifier',
+        'sku',
+        'categories',
+        'family',
+        'groups',
+        'parent',
+        'enabled',
+    ];
     /**
      * This variable contains a ProductImportHelper
      *
@@ -401,17 +444,18 @@ class Product extends Import
             'length' => 255,
             'default' => '',
             'COMMENT' => ' '
-        ]);
+        ]
+        );
 
-        /** @var string $variantTable */
-        $variantTable = $this->entitiesHelper->getTable('pimgento_product_model');
+        /** @var string $productModelTable */
+        $productModelTable = $this->entitiesHelper->getTable('pimgento_product_model');
 
-        if ($connection->tableColumnExists($variantTable, 'parent')) {
+        if ($connection->tableColumnExists($productModelTable, 'parent')) {
             $select = $connection->select()->from(false, [$groupColumn => 'v.parent'])->joinInner(
-                    ['v' => $variantTable],
-                    'v.parent IS NOT NULL AND e.' . $groupColumn . ' = v.code',
-                    []
-                );
+                ['v' => $productModelTable],
+                'v.parent IS NOT NULL AND e.' . $groupColumn . ' = v.code',
+                []
+            );
 
             $connection->query(
                 $connection->updateFromSelect($select, ['e' => $tmpTable])
@@ -437,6 +481,19 @@ class Product extends Import
 
         if ($connection->tableColumnExists($tmpTable, 'categories')) {
             $data['categories'] = 'e.categories';
+        }
+
+        /** @var string[] $associationNames */
+        foreach ($this->associationTypes as $associationNames) {
+            if (empty($associationNames)) {
+                continue;
+            }
+            /** @var string $associationName */
+            foreach ($associationNames as $associationName) {
+                if (!empty($associationName) && $connection->tableColumnExists($productModelTable, $associationName)) {
+                    $data[$associationName] = sprintf('v.%s', $associationName);
+                }
+            }
         }
 
         /** @var string|array $additional */
@@ -490,7 +547,7 @@ class Product extends Import
                 }
 
                 $data[$column] = 'e.' . $column;
-                if ($connection->tableColumnExists($variantTable, $column)) {
+                if ($connection->tableColumnExists($productModelTable, $column)) {
                     $data[$column] = 'v.' . $column;
                 }
             }
@@ -499,8 +556,8 @@ class Product extends Import
         /** @var Select $configurable */
         $configurable = $connection->select()
             ->from(['e' => $tmpTable], $data)
-            ->joinInner(['v' => $variantTable],'e.' . $groupColumn . ' = v.code', [])
-            ->where('e.' . $groupColumn.' <> ""')
+            ->joinInner(['v' => $productModelTable], 'e.' . $groupColumn . ' = v.code', [])
+            ->where('e.' . $groupColumn . ' <> ""')
             ->group('e.' . $groupColumn);
 
         /** @var string $query */
@@ -606,24 +663,9 @@ class Product extends Import
         $columns = array_keys($connection->describeTable($tmpTable));
         /** @var string[] $except */
         $except = [
-            '_entity_id',
-            '_is_new',
-            '_status',
-            '_type_id',
-            '_options_container',
-            '_tax_class_id',
-            '_attribute_set_id',
-            '_visibility',
-            '_children',
-            '_axis',
-            'identifier',
-            'categories',
-            'family',
-            'groups',
-            'parent',
             'url_key',
-            'enabled',
         ];
+        $except = array_merge($except, $this->excludedColumns);
 
         /** @var string $column */
         foreach ($columns as $column) {
@@ -773,25 +815,6 @@ class Product extends Import
         $stores = $this->storeHelper->getAllStores();
         /** @var string[] $columns */
         $columns = array_keys($connection->describeTable($tmpTable));
-        /** @var string[] $except */
-        $except = [
-            '_entity_id',
-            '_is_new',
-            '_status',
-            '_type_id',
-            '_options_container',
-            '_tax_class_id',
-            '_attribute_set_id',
-            '_visibility',
-            '_children',
-            '_axis',
-            'sku',
-            'categories',
-            'family',
-            'groups',
-            'parent',
-            'enabled',
-        ];
         /** @var array $values */
         $values = [
             0 => [
@@ -815,7 +838,7 @@ class Product extends Import
 
         /** @var string $column */
         foreach ($columns as $column) {
-            if (in_array($column, $except) || preg_match('/-unit/', $column)) {
+            if (in_array($column, $this->excludedColumns) || preg_match('/-unit/', $column)) {
                 continue;
             }
 
@@ -1218,48 +1241,43 @@ class Product extends Import
         $linkTable = $this->entitiesHelper->getTable('catalog_product_link');
         /** @var string $linkAttributeTable */
         $linkAttributeTable = $this->entitiesHelper->getTable('catalog_product_link_attribute');
-        /** @var array $related */
+        /** @var mixed[] $related */
         $related = [];
 
         /** @var string $columnIdentifier */
         $columnIdentifier = $this->entitiesHelper->getColumnIdentifier($productsTable);
 
-        if ($connection->tableColumnExists($tmpTable, 'UPSELL-products')) {
-            $related[Link::LINK_TYPE_UPSELL][] = '`p`.`UPSELL-products`';
-        }
-        if ($connection->tableColumnExists($tmpTable, 'UPSELL-product_models')) {
-            $related[Link::LINK_TYPE_UPSELL][] = '`p`.`UPSELL-product_models`';
-        }
-
-        if ($connection->tableColumnExists($tmpTable, 'X_SELL-products')) {
-            $related[Link::LINK_TYPE_CROSSSELL][] = '`p`.`X_SELL-products`';
-        }
-        if ($connection->tableColumnExists($tmpTable, 'X_SELL-product_models')) {
-            $related[Link::LINK_TYPE_CROSSSELL][] = '`p`.`X_SELL-product_models`';
-        }
-
-        if ($connection->tableColumnExists($tmpTable, 'SUBSTITUTION-products')) {
-            $related[Link::LINK_TYPE_RELATED][] = '`p`.`SUBSTITUTION-products`';
-        }
-        if ($connection->tableColumnExists($tmpTable, 'SUBSTITUTION-product_models')) {
-            $related[Link::LINK_TYPE_RELATED][] = '`p`.`SUBSTITUTION-product_models`';
+        /** @var int $linkType */
+        /** @var string[] $associationNames */
+        foreach ($this->associationTypes as $linkType => $associationNames) {
+            if (empty($associationNames)) {
+                continue;
+            }
+            /** @var string $associationName */
+            foreach ($associationNames as $associationName) {
+                if (!empty($associationName) && $connection->tableColumnExists($tmpTable, $associationName)) {
+                    $related[$linkType][] = sprintf('`p`.`%s`', $associationName);
+                }
+            }
         }
 
+        /**
+         * @var int      $typeId
+         * @var string[] $columns
+         */
         foreach ($related as $typeId => $columns) {
-            $concat = 'CONCAT(' . join(',",",', $columns) . ')';
-            $select = $connection->select()
-                ->from(['c' => $entitiesTable], [])
-                ->joinInner(
-                    ['p' => $tmpTable],
-                    'FIND_IN_SET(`c`.`code`, ' . $concat . ') AND
-                        `c`.`import` = "' . $this->getCode() . '"',
-                    [
-                        'product_id'        => 'p._entity_id',
-                        'linked_product_id' => 'c.entity_id',
-                        'link_type_id'      => new Expr($typeId)
-                    ]
-                )
-                ->joinInner(['e' => $productsTable], 'c.entity_id = e.' . $columnIdentifier, []);
+            /** @var string $concat */
+            $concat = sprintf('CONCAT_WS(",", %s)', implode(', ', $columns));
+            /** @var \Magento\Framework\DB\Select $select */
+            $select = $connection->select()->from(['c' => $entitiesTable], [])->joinInner(
+                ['p' => $tmpTable],
+                sprintf('FIND_IN_SET(`c`.`code`, %s) AND `c`.`import` = "%s"', $concat, $this->getCode()),
+                [
+                    'product_id'        => 'p._entity_id',
+                    'linked_product_id' => 'c.entity_id',
+                    'link_type_id'      => new Expr($typeId),
+                ]
+            )->joinInner(['e' => $productsTable], sprintf('c.entity_id = e.%s', $columnIdentifier), []);
 
             /* Remove old link */
             $connection->delete(
