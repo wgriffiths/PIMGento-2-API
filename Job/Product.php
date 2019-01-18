@@ -94,6 +94,30 @@ class Product extends Import
      */
     protected $allowedTypeId = ['simple', 'virtual'];
     /**
+     * List of column to exclude from attribute value setting
+     *
+     * @var string[]
+     */
+    protected $excludedColumns = [
+        '_entity_id',
+        '_is_new',
+        '_status',
+        '_type_id',
+        '_options_container',
+        '_tax_class_id',
+        '_attribute_set_id',
+        '_visibility',
+        '_children',
+        '_axis',
+        'identifier',
+        'sku',
+        'categories',
+        'family',
+        'groups',
+        'parent',
+        'enabled',
+    ];
+    /**
      * This variable contains a ProductImportHelper
      *
      * @var ProductImportHelper $entitiesHelper
@@ -639,24 +663,9 @@ class Product extends Import
         $columns = array_keys($connection->describeTable($tmpTable));
         /** @var string[] $except */
         $except = [
-            '_entity_id',
-            '_is_new',
-            '_status',
-            '_type_id',
-            '_options_container',
-            '_tax_class_id',
-            '_attribute_set_id',
-            '_visibility',
-            '_children',
-            '_axis',
-            'identifier',
-            'categories',
-            'family',
-            'groups',
-            'parent',
             'url_key',
-            'enabled',
         ];
+        $except = array_merge($except, $this->excludedColumns);
 
         /** @var string $column */
         foreach ($columns as $column) {
@@ -806,25 +815,6 @@ class Product extends Import
         $stores = $this->storeHelper->getAllStores();
         /** @var string[] $columns */
         $columns = array_keys($connection->describeTable($tmpTable));
-        /** @var string[] $except */
-        $except = [
-            '_entity_id',
-            '_is_new',
-            '_status',
-            '_type_id',
-            '_options_container',
-            '_tax_class_id',
-            '_attribute_set_id',
-            '_visibility',
-            '_children',
-            '_axis',
-            'sku',
-            'categories',
-            'family',
-            'groups',
-            'parent',
-            'enabled',
-        ];
         /** @var array $values */
         $values = [
             0 => [
@@ -848,7 +838,7 @@ class Product extends Import
 
         /** @var string $column */
         foreach ($columns as $column) {
-            if (in_array($column, $except) || preg_match('/-unit/', $column)) {
+            if (in_array($column, $this->excludedColumns) || preg_match('/-unit/', $column)) {
                 continue;
             }
 
