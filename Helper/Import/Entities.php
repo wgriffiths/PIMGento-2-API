@@ -497,7 +497,7 @@ class Entities extends AbstractHelper
                 $values = [
                     'value' => new Expr('NULL'),
                 ];
-                $where  = [
+                $where = [
                     'value = ?' => '0000-00-00 00:00:00',
                 ];
                 $connection->update(
