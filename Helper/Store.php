@@ -174,4 +174,22 @@ class Store extends AbstractHelper
 
         return $stores;
     }
+
+    /**
+     * Retrieve admin store lang setting
+     * Default: return Mage_Core_Model_Locale::DEFAULT_LOCALE
+     *
+     * @return string
+     */
+    public function getAdminLang()
+    {
+        /** @var string $adminLang */
+        $adminLang = \Magento\Framework\Locale\Resolver::DEFAULT_LOCALE;
+
+        if ($this->scopeConfig->isSetFlag(\Magento\Directory\Helper\Data::XML_PATH_DEFAULT_LOCALE)) {
+            $adminLang = $this->scopeConfig->getValue(\Magento\Directory\Helper\Data::XML_PATH_DEFAULT_LOCALE);
+        }
+
+        return $adminLang;
+    }
 }

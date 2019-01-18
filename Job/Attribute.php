@@ -300,6 +300,12 @@ class Attribute extends Import
         $connection = $this->entitiesHelper->getConnection();
         /** @var string $tmpTable */
         $tmpTable = $this->entitiesHelper->getTableName($this->getCode());
+
+        /** @var string $adminLang */
+        $adminLang = $this->storeHelper->getAdminLang();
+        /** @var string $adminLabelColumn */
+        $adminLabelColumn = sprintf('labels-%s', $adminLang);
+
         /** @var Select $import */
         $import = $connection->select()->from($tmpTable);
         /** @var \Zend_Db_Statement_Interface $query */
@@ -329,16 +335,10 @@ class Attribute extends Import
             );
 
             /* Retrieve default admin label */
-            /** @var array $stores */
-            $stores = $this->storeHelper->getStores();
             /** @var string $frontendLabel */
             $frontendLabel = __('Unknown');
-            if (isset($stores[0])) {
-                /** @var array $admin */
-                $admin = reset($stores[0]);
-                if (isset($row['labels-'.$admin['lang']])) {
-                    $frontendLabel = $row['labels-'.$admin['lang']];
-                }
+            if (!empty($row[$adminLabelColumn])) {
+                $frontendLabel = $row[$adminLabelColumn];
             }
 
             /* Retrieve attribute scope */
