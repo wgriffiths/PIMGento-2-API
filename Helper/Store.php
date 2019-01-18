@@ -64,91 +64,91 @@ class Store extends AbstractHelper
     /**
      * Retrieve all stores information
      *
-     * @param string|array $arrayKey
+     * @param string|string[] $arrayKey
      *
-     * @return array
+     * @return mixed[]
      */
     public function getStores($arrayKey = 'store_id')
     {
-        /** @var StoreInterface[] $stores */
-        $stores = $this->storeManager->getStores(true);
-        /** @var array $data */
-        $data = [];
-
         if (!is_array($arrayKey)) {
             $arrayKey = [$arrayKey];
         }
-        /** @var string|array $channels */
-        $channels = $this->configHelper->getWebsiteMapping();
 
-        if ($channels) {
-            $channels = $this->serializer->unserialize($channels);
-            if (!is_array($channels)) {
-                $channels = [];
+        /** @var mixed[] $data */
+        $data = [];
+
+        /** @var mixed[] $mapping */
+        $mapping = $this->configHelper->getWebsiteMapping();
+        /** @var string[] $match */
+        foreach ($mapping as $match) {
+            if (empty($match['channel']) || empty($match['website'])) {
+                continue;
             }
-        } else {
-            $channels = [];
-        }
-
-        /** @var StoreInterface $store */
-        foreach ($stores as $store) {
-            /** @var WebsiteInterface $website */
-            $website = $this->storeManager->getWebsite($store->getWebsiteId());
             /** @var string $channel */
-            $channel = $website->getCode();
-            /** @var array $match */
-            foreach ($channels as $match) {
-                if (isset($match['website']) && $match['website'] === $website->getCode()) {
-                    $channel = $match['channel'];
-                }
-            }
-            /** @var array $combine */
-            $combine = [];
-            /** @var string $key */
-            foreach ($arrayKey as $key) {
-                switch ($key) {
-                    case 'store_id':
-                        $combine[] = $store->getId();
-                        break;
-                    case 'store_code':
-                        $combine[] = $store->getCode();
-                        break;
-                    case 'website_id':
-                        $combine[] = $website->getId();
-                        break;
-                    case 'website_code':
-                        $combine[] = $website->getCode();
-                        break;
-                    case 'channel_code':
-                        $combine[] = $channel;
-                        break;
-                    case 'lang':
-                        $combine[] = $this->configHelper->getDefaultLocale($store->getId());
-                        break;
-                    case 'currency':
-                        $combine[] = $this->configHelper->getDefaultCurrency($store->getId());
-                        break;
-                    default:
-                        $combine[] = $store->getId();
-                        break;
-                }
-            }
-            /** @var string $key */
-            $key = join('-', $combine);
-
-            if (!isset($data[$key])) {
-                $data[$key] = [];
+            $channel = $match['channel'];
+            /** @var string $websiteCode */
+            $websiteCode = $match['website'];
+            /** @var WebsiteInterface $website */
+            $website = $this->storeManager->getWebsite($websiteCode);
+            /** @var int $websiteId */
+            $websiteId = $website->getId();
+            if (!isset($websiteId)) {
+                continue;
             }
 
-            $data[$key][] = [
-                'store_id'     => $store->getId(),
-                'store_code'   => $store->getCode(),
-                'website_id'   => $website->getId(),
-                'website_code' => $website->getCode(),
-                'channel_code' => $channel,
-                'lang'         => $this->configHelper->getDefaultLocale($store->getId()),
-                'currency'     => $this->configHelper->getDefaultCurrency($store->getId()),
-            ];
+            /** @var Mage_Core_Model_Store[] $store */
+            $stores = $website->getStores();
+            /** @var Mage_Core_Model_Store $store */
+            foreach ($stores as $store) {
+                /** @var array $combine */
+                $combine = [];
+                /** @var string $key */
+                foreach ($arrayKey as $key) {
+                    switch ($key) {
+                        case 'store_id':
+                            $combine[] = $store->getId();
+                            break;
+                        case 'store_code':
+                            $combine[] = $store->getCode();
+                            break;
+                        case 'website_id':
+                            $combine[] = $website->getId();
+                            break;
+                        case 'website_code':
+                            $combine[] = $website->getCode();
+                            break;
+                        case 'channel_code':
+                            $combine[] = $channel;
+                            break;
+                        case 'lang':
+                            $combine[] = $this->configHelper->getDefaultLocale($store->getId());
+                            break;
+                        case 'currency':
+                            $combine[] = $this->configHelper->getDefaultCurrency($store->getId());
+                            break;
+                        default:
+                            $combine[] = $store->getId();
+                            break;
+                    }
+                }
+
+                /** @var string $key */
+                $key = implode('-', $combine);
+
+                if (!isset($data[$key])) {
+                    $data[$key] = [];
+                }
+
+                $data[$key][] = [
+                    'store_id'     => $store->getId(),
+                    'store_code'   => $store->getCode(),
+                    'website_id'   => $website->getId(),
+                    'website_code' => $website->getCode(),
+                    'channel_code' => $channel,
+                    'lang'         => $this->configHelper->getDefaultLocale($store->getId()),
+                    'currency'     => $this->configHelper->getDefaultCurrency($store->getId()),
+                ];
+            }
         }
 
         return $data;
