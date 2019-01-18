@@ -28,3 +28,10 @@ Fix documentation
 Reformat translations
 
 Fix localized product URL
+
+### 100.1.4 :
+Add PHP 7.2 compatibility
+
+Fix error on product_model table
+
+Add configuration to enable or disable product URL rewriting
