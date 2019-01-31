@@ -224,6 +224,7 @@ class Product extends Import
      */
     public function createTable()
     {
+        return;
         /** @var PageInterface $products */
         $products = $this->akeneoClient->getProductApi()->listPerPage(1);
         /** @var array $products */
@@ -249,6 +250,7 @@ class Product extends Import
      */
     public function createProductCategoriesTable()
     {
+        return;
         /** @var AdapterInterface $connection */
         $connection = $this->entitiesHelper->getConnection();
 
@@ -304,6 +306,7 @@ class Product extends Import
      */
     public function insertData()
     {
+        return;
         /** @var array $filters */
         $filters = $this->productFilters->getFilters();
         /** @var string|int $paginationSize */
@@ -1138,6 +1141,7 @@ class Product extends Import
      */
     public function insertCategoryMappings()
     {
+        return;
         /** @var AdapterInterface $connection */
         $connection = $this->entitiesHelper->getConnection();
         /** @var string $tmpTable */
