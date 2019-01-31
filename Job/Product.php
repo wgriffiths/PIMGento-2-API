@@ -240,6 +240,47 @@ class Product extends Import
         $this->entitiesHelper->createTmpTableFromApi($product, $this->getCode());
     }
 
+
+    public $categoryMappingTable = "tmp_pimgento_category_mapping";
+    /**
+     * Set createCategoriesMappingsTable
+     *
+     * @return void
+     */
+    public function createProductCategoriesTable()
+    {
+        /* Delete table if exists */
+        $this->entitiesHelper->dropTable($this->categoryMappingTable);
+
+        /** @var AdapterInterface $connection */
+        $connection = $this->entitiesHelper->getConnection();
+
+        /* Create new table */
+        /** @var Table $table */
+        $table = $connection->newTable($this->categoryMappingTable);
+        $table->addColumn(
+            "identifier",
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            25,
+            [],
+            "identifier"
+        );
+        $table->addColumn(
+            "category",
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            25,
+            [],
+            "category"
+        );
+        $table->addIndex(
+            'UNIQUE_PRODUCT_CATEGORY',
+            ['identifier','category'],
+        ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
+        );
+        $table->setOption('type', 'MYISAM');
+        $connection->createTable($table);
+    }
+
     /**
      * Insert data into temporary table
      *
