@@ -197,8 +197,9 @@ class Entities extends AbstractHelper
         }
 
         $table->addColumn(
-            'identifier',
-            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            '_entity_id',
+            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+            11,
             [],
             'Entity Id'
         );
