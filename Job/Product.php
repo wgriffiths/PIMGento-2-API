@@ -249,33 +249,49 @@ class Product extends Import
      */
     public function createProductCategoriesTable()
     {
-        /* Delete table if exists */
-        $this->entitiesHelper->dropTable($this->categoryMappingTable);
-
         /** @var AdapterInterface $connection */
         $connection = $this->entitiesHelper->getConnection();
+
+        /* Delete table if exists */
+        $connection->resetDdlCache($this->categoryMappingTable);
+        $connection->dropTable($this->categoryMappingTable);
+
+
 
         /* Create new table */
         /** @var Table $table */
         $table = $connection->newTable($this->categoryMappingTable);
         $table->addColumn(
-            "identifier",
-            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-            25,
+            "product_entity_id",
+            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+            11,
             [],
-            "identifier"
+            "product_entity_id"
         );
         $table->addColumn(
-            "category",
+            "category_code",
             \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-            25,
+            255,
             [],
-            "category"
+            "category_code"
         );
+
         $table->addIndex(
             'UNIQUE_PRODUCT_CATEGORY',
-            ['identifier','category'],
+            ['product_entity_id','category_code'],
         ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
+        );
+
+        $table->addIndex(
+            'PRODUCT_ENTITY_ID',
+            ['product_entity_id'],
+            ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_INDEX]
+        );
+
+        $table->addIndex(
+            'CATEGORY_CODE',
+            ['category_code'],
+            ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_INDEX]
         );
         $table->setOption('type', 'MYISAM');
         $connection->createTable($table);
@@ -1116,6 +1132,47 @@ class Product extends Import
     }
 
     /**
+     * Insert data into temporary table
+     *
+     * @return void
+     */
+    public function insertCategoryMappings()
+    {
+        /** @var AdapterInterface $connection */
+        $connection = $this->entitiesHelper->getConnection();
+        /** @var string $tmpTable */
+        $tmpTable = $this->entitiesHelper->getTableName($this->getCode());
+        $select = $connection->select()->from($tmpTable, ['_entity_id','categories']);
+
+        $insertData = [];
+        $mappingsTableName = $this->categoryMappingTable;
+
+
+        /** @var \Magento\Framework\DB\Statement\Pdo\Mysql $query */
+        $query = $connection->query($select);
+
+        /** @var array $row */
+        while (($row = $query->fetch())) {
+            $product_entity_id = $row['_entity_id'];
+            $categories = explode(",",$row['categories']);
+            foreach ($categories as $category) {
+                $insertData[] = [
+                    'product_entity_id' => $product_entity_id,
+                    'category_code' => $category,
+                ];
+                if (sizeof($insertData) > self::CONFIGURABLE_INSERTION_MAX_SIZE - 1) {
+                    $connection->insertMultiple($mappingsTableName, $insertData);
+                    $insertData = [];
+                }
+            }
+        }
+        if (sizeof($insertData) > 0 ) {
+            $connection->insertMultiple($mappingsTableName, $insertData);
+        }
+    }
+
+
+    /**
      * Set website
      *
      * @return void
@@ -1182,8 +1239,12 @@ class Product extends Import
         $select = $connection->select()
             ->from(['c' => $this->entitiesHelper->getTable('pimgento_entities')], [])
             ->joinInner(
+                ['cm' => $this->categoryMappingTable],
+                '`c`.`import` = "category" AND `cm`.`category_code` = `c`.`code`',[]
+                )
+            ->joinInner(
                 ['p' => $tmpTable],
-                'FIND_IN_SET(`c`.`code`, `p`.`categories`) AND `c`.`import` = "category"',
+                '`p`._entity_id = `cm`.product_entity_id',
                 [
                     'category_id' => 'c.entity_id',
                     'product_id'  => 'p._entity_id',
@@ -1193,6 +1254,7 @@ class Product extends Import
                 'c.entity_id = e.entity_id',
                 []
             );
+
 
         $connection->query(
             $connection->insertFromSelect(
@@ -1207,8 +1269,12 @@ class Product extends Import
         $selectToDelete = $connection->select()
             ->from(['c' => $this->entitiesHelper->getTable('pimgento_entities')], [])
             ->joinInner(
+                ['cm' => $this->categoryMappingTable],
+                '`c`.`import` = "category" AND `cm`.`category_code` = `c`.`code`',[]
+            )
+            ->joinInner(
                 ['p' => $tmpTable],
-                '!FIND_IN_SET(`c`.`code`, `p`.`categories`) AND `c`.`import` = "category"',
+                '`p`._entity_id <> `cm`.product_entity_id',
                 [
                     'category_id' => 'c.entity_id',
                     'product_id'  => 'p._entity_id',
@@ -1218,7 +1284,6 @@ class Product extends Import
                 'c.entity_id = e.entity_id',
                 []
             );
-
         $connection->delete(
             $this->entitiesHelper->getTable('catalog_category_product'),
             '(category_id, product_id) IN (' . $selectToDelete->assemble() . ')'
