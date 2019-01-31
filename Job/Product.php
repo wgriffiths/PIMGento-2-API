@@ -356,7 +356,7 @@ class Product extends Import
                     'category' => $category,
                 ];
 
-                if (sizeof($insertData) <= self::CONFIGURABLE_INSERTION_MAX_SIZE) {
+                if (sizeof($insertData) > self::CONFIGURABLE_INSERTION_MAX_SIZE - 1) {
                     $connection->insertMultiple($mappingsTableName, $insertData);
                     $insertData = [];
                 }
