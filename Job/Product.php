@@ -1274,11 +1274,11 @@ class Product extends Import
             ->from(['c' => $this->entitiesHelper->getTable('pimgento_entities')], [])
             ->joinInner(
                 ['cm' => $this->categoryMappingTable],
-                '`c`.`import` = "category" AND `cm`.`category_code` = `c`.`code`',[]
+                '`c`.`import` = "category" AND `cm`.`category_code` <> `c`.`code`',[]
             )
             ->joinInner(
                 ['p' => $tmpTable],
-                '`p`._entity_id <> `cm`.product_entity_id',
+                '`p`._entity_id = `cm`.product_entity_id',
                 [
                     'category_id' => 'c.entity_id',
                     'product_id'  => 'p._entity_id',
