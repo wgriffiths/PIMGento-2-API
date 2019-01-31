@@ -11,8 +11,7 @@
     "akeneo/api-php-client-ee": "^3.0",
     "php-http/guzzle6-adapter": "^1.1"
   },
-  "type": "magento2-module",
-  "version": "100.2.1",
+  "type": "magento2-module",  
   "license": [
     "OSL-3.0",
     "AFL-3.0"
