@@ -43,6 +43,18 @@ class ImportRepository implements ImportRepositoryInterface
     protected $configHelper;
 
     /**
+     * Used for lazzy loading collection.
+     *
+     * @var bool
+     */
+    private $initialized = false;
+
+    /**
+     * @var array $data
+     */
+    private $data;
+
+    /**
      * ImportRepository constructor.
      *
      * @param EntityFactoryInterface $entityFactory
@@ -61,8 +73,7 @@ class ImportRepository implements ImportRepositoryInterface
         $this->entityFactory = $entityFactory;
         $this->collection    = $collectionFactory->create();
         $this->configHelper  = $configHelper;
-
-        $this->initCollection($data);
+        $this->data = $data;
     }
 
     /**
@@ -73,9 +84,15 @@ class ImportRepository implements ImportRepositoryInterface
      * @return void
      * @throws \Exception
      */
-    private function initCollection($data)
+    private function initCollection()
     {
-        foreach ($data as $id => $class) {
+        if ($this->initialized) {
+            return;
+        }
+
+        $this->initialized = true;
+
+        foreach ($this->data as $id => $class) {
             if (!class_exists($class)) {
                 continue;
             }
@@ -97,6 +114,7 @@ class ImportRepository implements ImportRepositoryInterface
      */
     public function add(DataObject $import)
     {
+        $this->initCollection();
         $this->collection->addItem($import);
     }
 
@@ -105,6 +123,7 @@ class ImportRepository implements ImportRepositoryInterface
      */
     public function getByCode($code)
     {
+        $this->initCollection();
         /** @var ImportInterface $import */
         $import = $this->collection->getItemById($code);
 
@@ -116,6 +135,7 @@ class ImportRepository implements ImportRepositoryInterface
      */
     public function getList()
     {
+        $this->initCollection();
         return $this->collection;
     }
 
@@ -124,6 +144,7 @@ class ImportRepository implements ImportRepositoryInterface
      */
     public function deleteByCode($code)
     {
+        $this->initCollection();
         $this->collection->removeItemByKey($code);
     }
 }
